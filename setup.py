@@ -1,15 +1,15 @@
 from setuptools import setup
 
 setup(
-    name='SpreadFlowProcXslt',
+    name='SpreadFlowXslt',
     version='0.0.1',
     description='XSLT processor for SpreadFlow metadata extraction and processing engine',
     author='Lorenz Schori',
     author_email='lo@znerol.ch',
-    url='https://github.com/znerol/spreadflow-proc-xslt',
+    url='https://github.com/znerol/spreadflow-xslt',
     packages=[
-        'spreadflow_proc_xslt',
-        'spreadflow_proc_xslt.test'
+        'spreadflow_xslt',
+        'spreadflow_xslt.test'
     ],
     install_requires=[
         'SpreadFlowCore',

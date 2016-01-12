@@ -4,8 +4,8 @@ from __future__ import unicode_literals
 
 from twisted.trial import unittest
 
-from spreadflow_proc_xslt import XsltPipeline
+from spreadflow_xslt.proc import XsltPipeline
 
 
-class SpreadflowProcXsltTestCase(unittest.TestCase):
+class SpreadflowXsltTestCase(unittest.TestCase):
     pass

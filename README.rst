@@ -1,8 +1,8 @@
 SpreadFlow XSLT Processor
 =========================
 
-.. image:: https://travis-ci.org/znerol/spreadflow-proc-xslt.svg?branch=master
-    :target: https://travis-ci.org/znerol/spreadflow-proc-xslt
+.. image:: https://travis-ci.org/znerol/spreadflow-xslt.svg?branch=master
+    :target: https://travis-ci.org/znerol/spreadflow-xslt
 
 
 XSLT processor for SpreadFlow metadata extraction and processing engine.
