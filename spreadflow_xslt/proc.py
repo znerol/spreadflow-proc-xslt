@@ -19,11 +19,12 @@ class XsltPipeline(object):
 
     extensions = ('xsl', 'xslt')
 
-    def __init__(self, path, attrib='content', dest='transformed', params=None):
+    def __init__(self, path, attrib='content', dest='transformed', encoding=None, params=None):
         self.path = path
         self.attrib = attrib
         self.dest = dest
         self.transformers = []
+        self.encoding = encoding
 
         self._literal_params = ()
         self._strparams = ()
@@ -70,18 +71,14 @@ class XsltPipeline(object):
     def _transform(self, item):
         for oid in item['inserts']:
             markup = item['data'][oid][self.attrib]
-            # work around lxml insisting on untagged strings.
-            # TODO: This is brittle. Either exclusively work with unicode
-            # throughout the system (and thus remove the XML declaration when
-            # reading a file from disk) or exclusively work with buffers (and
-            # always keep the XML declaration).
-            if isinstance(markup, unicode):
-                markup = markup.encode("utf-8")
             for t in self.transformers:
                 params = self._extract_params(item['data'][oid])
                 doc = etree.fromstring(markup)
-                markup = unicode(t(doc, **params))
+                markup = bytes(t(doc, **params))
                 yield
+
+            if self.encoding != None:
+                markup = markup.decode(self.encoding)
 
             item['data'][oid][self.dest] = markup
 
