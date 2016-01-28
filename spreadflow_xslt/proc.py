@@ -19,10 +19,10 @@ class XsltPipeline(object):
 
     extensions = ('xsl', 'xslt')
 
-    def __init__(self, path, attrib='content', dest='transformed', encoding=None, params=None, coiterate=True):
+    def __init__(self, path, key='content', destkey='transformed', encoding=None, params=None, coiterate=True):
         self.path = path
-        self.attrib = attrib
-        self.dest = dest
+        self.key = key
+        self.destkey = destkey
         self.transformers = []
         self.encoding = encoding
 
@@ -38,29 +38,29 @@ class XsltPipeline(object):
         self._strparams = ()
         self._rawparams = ()
 
-        def _add_literal_param(key, value, raw=False):
-            self._literal_params += ((key, value),) if raw else ((key, XSLT.strparam(value)),)
+        def _add_literal_param(param, value, raw=False):
+            self._literal_params += ((param, value),) if raw else ((param, XSLT.strparam(value)),)
 
         if params:
-            for key, value in params.items():
+            for param, value in params.items():
                 if isinstance(value, collections.Mapping):
                     raw = value.get('raw', False)
                     if 'value' in value:
-                        _add_literal_param(key, value['value'], raw)
+                        _add_literal_param(param, value['value'], raw)
                         continue
 
                     if 'from' in value:
                         if raw:
-                            self._rawparams += ((key, value['from']),)
+                            self._rawparams += ((param, value['from']),)
                         else:
-                            self._strparams += ((key, value['from']),)
+                            self._strparams += ((param, value['from']),)
                         continue
 
                 if isinstance(value, basestring):
-                    _add_literal_param(key, value, False)
+                    _add_literal_param(param, value, False)
                     continue
 
-                _add_literal_param(key, value, True)
+                _add_literal_param(param, value, True)
 
 
     def start(self):
@@ -79,7 +79,7 @@ class XsltPipeline(object):
 
     def _transform(self, item):
         for oid in item['inserts']:
-            markup = item['data'][oid][self.attrib]
+            markup = item['data'][oid][self.key]
             for t in self.transformers:
                 params = self._extract_params(item['data'][oid])
                 doc = etree.fromstring(markup)
@@ -89,7 +89,7 @@ class XsltPipeline(object):
             if self.encoding != None:
                 markup = markup.decode(self.encoding)
 
-            item['data'][oid][self.dest] = markup
+            item['data'][oid][self.destkey] = markup
 
     def _dummy_coiterate(self, iterator):
         for x in iterator:
@@ -103,6 +103,6 @@ class XsltPipeline(object):
     def _extract_params(self, doc):
         return dict(
             self._literal_params +
-            tuple([(key, doc[value]) for key, value in self._rawparams]) +
-            tuple([(key, XSLT.strparam(doc[value])) for key, value in self._strparams])
+            tuple([(param, doc[value]) for param, value in self._rawparams]) +
+            tuple([(param, XSLT.strparam(doc[value])) for param, value in self._strparams])
         )
