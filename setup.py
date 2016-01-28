@@ -1,6 +1,7 @@
 from setuptools import setup
 
 tests_require = [
+    'SpreadFlowDelta[tests]',
     'mock',
     'testtools'
 ]
