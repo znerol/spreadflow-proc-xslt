@@ -3,6 +3,7 @@ from __future__ import division
 from __future__ import unicode_literals
 
 import collections
+import functools
 import glob
 import os
 
@@ -65,7 +66,7 @@ class XsltPipeline(object):
     def start(self):
         if (os.path.isdir(self.path)):
             patterns = [os.path.join(self.path, '*.%s' % ext) for ext in self.extensions]
-            discovered = reduce(lambda head, tail: head + tail, [glob.glob(pattern) for pattern in patterns], [])
+            discovered = functools.reduce(lambda head, tail: head + tail, [glob.glob(pattern) for pattern in patterns], [])
             for path in sorted(discovered, key=lambda s: s.lower()):
                 self._load_file(path)
         else:
