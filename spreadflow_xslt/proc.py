@@ -7,7 +7,6 @@ import glob
 import os
 
 from twisted.internet import defer
-from twisted.internet.task import coiterate
 
 # Use parser from defusedxml if possible.
 from defusedxml import lxml as etree
@@ -19,12 +18,20 @@ class XsltPipeline(object):
 
     extensions = ('xsl', 'xslt')
 
-    def __init__(self, path, attrib='content', dest='transformed', encoding=None, params=None):
+    def __init__(self, path, attrib='content', dest='transformed', encoding=None, params=None, coiterate=True):
         self.path = path
         self.attrib = attrib
         self.dest = dest
         self.transformers = []
         self.encoding = encoding
+
+        if coiterate == True:
+            from twisted.internet.task import coiterate
+
+        if coiterate:
+            self.coiterate = coiterate
+        else:
+            self.coiterate = self._dummy_coiterate
 
         self._literal_params = ()
         self._strparams = ()
@@ -65,7 +72,7 @@ class XsltPipeline(object):
 
     @defer.inlineCallbacks
     def __call__(self, item, send):
-        yield coiterate(self._transform(item))
+        yield self.coiterate(self._transform(item))
         send(item, self)
 
     def _transform(self, item):
@@ -82,6 +89,11 @@ class XsltPipeline(object):
 
             item['data'][oid][self.dest] = markup
 
+    def _dummy_coiterate(self, iterator):
+        for x in iterator:
+            continue
+
+        return defer.succeed(iterator)
 
     def _load_file(self, path):
         self.transformers.append(XSLT(etree.parse(path)))
