@@ -65,7 +65,8 @@ class XsltPipeline(object):
     def start(self):
         if (os.path.isdir(self.path)):
             patterns = [os.path.join(self.path, '*.%s' % ext) for ext in self.extensions]
-            for path in sorted(reduce(lambda x, y: x + y, [glob.glob(pattern) for pattern in patterns], [])):
+            discovered = reduce(lambda head, tail: head + tail, [glob.glob(pattern) for pattern in patterns], [])
+            for path in sorted(discovered, key=lambda s: s.lower()):
                 self._load_file(path)
         else:
             self._load_file(self.path)
