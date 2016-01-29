@@ -4,26 +4,22 @@ from __future__ import unicode_literals
 
 import collections
 import functools
-import glob
-import os
 
 from twisted.internet import defer
 
-# Use parser from defusedxml if possible.
-from defusedxml import lxml as etree
+# Use parser from defusedxml.
+from defusedxml.lxml import fromstring as defusedxml_fromstring
 
 # XSLT is not present in defusedxml, explicitely get the one from lxml.
-from lxml.etree import XSLT
+from lxml import etree
 
-class XsltPipeline(object):
-
-    extensions = ('xsl', 'xslt')
+class XSLT(object):
 
     def __init__(self, path, key='content', destkey='transformed', encoding=None, params=None, coiterate=True):
         self.path = path
         self.key = key
         self.destkey = destkey
-        self.transformers = []
+        self.transformer = None
         self.encoding = encoding
 
         if coiterate == True:
@@ -39,7 +35,7 @@ class XsltPipeline(object):
         self._rawparams = ()
 
         def _add_literal_param(param, value, raw=False):
-            self._literal_params += ((param, value),) if raw else ((param, XSLT.strparam(value)),)
+            self._literal_params += ((param, value),) if raw else ((param, etree.XSLT.strparam(value)),)
 
         if params:
             for param, value in params.items():
@@ -62,34 +58,28 @@ class XsltPipeline(object):
 
                 _add_literal_param(param, value, True)
 
-
-    def start(self):
-        if (os.path.isdir(self.path)):
-            patterns = [os.path.join(self.path, '*.%s' % ext) for ext in self.extensions]
-            discovered = functools.reduce(lambda head, tail: head + tail, [glob.glob(pattern) for pattern in patterns], [])
-            for path in sorted(discovered, key=lambda s: s.lower()):
-                self._load_file(path)
-        else:
-            self._load_file(self.path)
-
     @defer.inlineCallbacks
     def __call__(self, item, send):
         yield self.coiterate(self._transform(item))
         send(item, self)
 
     def _transform(self, item):
+        if not self.transformer:
+            self.transformer = etree.XSLT(etree.parse(self.path))
+            yield
+
         for oid in item['inserts']:
             markup = item['data'][oid][self.key]
-            for t in self.transformers:
-                params = self._extract_params(item['data'][oid])
-                doc = etree.fromstring(markup)
-                markup = bytes(t(doc, **params))
-                yield
+            doc = defusedxml_fromstring(markup)
+            params = self._extract_params(item['data'][oid])
+            markup = bytes(self.transformer(doc, **params))
 
             if self.encoding != None:
                 markup = markup.decode(self.encoding)
 
             item['data'][oid][self.destkey] = markup
+
+            yield
 
     def _dummy_coiterate(self, iterator):
         for x in iterator:
@@ -97,12 +87,9 @@ class XsltPipeline(object):
 
         return defer.succeed(iterator)
 
-    def _load_file(self, path):
-        self.transformers.append(XSLT(etree.parse(path)))
-
     def _extract_params(self, doc):
         return dict(
             self._literal_params +
             tuple([(param, doc[value]) for param, value in self._rawparams]) +
-            tuple([(param, XSLT.strparam(doc[value])) for param, value in self._strparams])
+            tuple([(param, etree.XSLT.strparam(doc[value])) for param, value in self._strparams])
         )
