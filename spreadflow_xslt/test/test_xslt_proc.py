@@ -78,12 +78,12 @@ class XsltPipelineTransformUnitTest(TestCase):
 
         input_data = b''
         input_path = os.path.join(FIXTURE_DIRECTORY, '01-spec-document-example.xml')
-        with open(input_path, 'r') as input_file:
+        with open(input_path, 'rb') as input_file:
             input_data = input_file.read()
 
         expected_data = b''
         expected_path = os.path.join(FIXTURE_DIRECTORY, '01-spec-document-example.html')
-        with open(expected_path, 'r') as expected_file:
+        with open(expected_path, 'rb') as expected_file:
             expected_data = expected_file.read()
 
         xsl_path = os.path.join(FIXTURE_DIRECTORY, '01-spec-document-example.xsl')
@@ -122,12 +122,12 @@ class XsltPipelineTransformUnitTest(TestCase):
 
         input_data = b''
         input_path = os.path.join(FIXTURE_DIRECTORY, '02-spec-data-example.xml')
-        with open(input_path, 'r') as input_file:
+        with open(input_path, 'rb') as input_file:
             input_data = input_file.read()
 
         expected_data = b''
         expected_path = os.path.join(FIXTURE_DIRECTORY, '02-spec-data-example.html')
-        with open(expected_path, 'r') as expected_file:
+        with open(expected_path, 'rb') as expected_file:
             expected_data = expected_file.read()
 
         xsl_path = os.path.join(FIXTURE_DIRECTORY, '02-spec-data-example.xsl')
