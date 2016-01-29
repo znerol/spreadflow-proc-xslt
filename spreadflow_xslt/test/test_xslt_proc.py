@@ -51,7 +51,7 @@ class XSLTTransformUnitTest(TestCase):
         }
 
         expected = copy.deepcopy(item)
-        expected['data']['a']['transformed'] = expected_data
+        expected['data']['a']['content'] = expected_data
 
         matches = MatchesSendDeltaItemInvocation(expected, pipe)
         send = Mock(spec=Scheduler.send)

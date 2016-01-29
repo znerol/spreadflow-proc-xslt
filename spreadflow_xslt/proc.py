@@ -15,10 +15,10 @@ from lxml import etree
 
 class XSLT(object):
 
-    def __init__(self, path, key='content', destkey='transformed', encoding=None, params=None, coiterate=True):
+    def __init__(self, path, key='content', destkey=None, encoding=None, params=None, coiterate=True):
         self.path = path
         self.key = key
-        self.destkey = destkey
+        self.destkey = destkey if destkey else key
         self.transformer = None
         self.encoding = encoding
 
