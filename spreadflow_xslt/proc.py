@@ -19,6 +19,7 @@ class XSLT(object):
         self.path = path
         self.key = key
         self.destkey = destkey if destkey else key
+        self.doc = None
         self.transformer = None
         self.encoding = encoding
 
@@ -64,13 +65,20 @@ class XSLT(object):
         send(item, self)
 
     def _transform(self, item):
-        if not self.transformer:
-            self.transformer = etree.XSLT(etree.parse(self.path))
+        if not self.doc:
+            self.doc = etree.parse(self.path)
             yield
 
+        if not self.transformer:
+            self.transformer = etree.XSLT(self.doc)
+
         for oid in item['inserts']:
-            markup = item['data'][oid][self.key]
-            doc = defusedxml_fromstring(markup)
+            if self.key:
+                markup = item['data'][oid][self.key]
+                doc = defusedxml_fromstring(markup)
+            else:
+                doc = self.doc
+
             params = self._extract_params(item['data'][oid])
             markup = bytes(self.transformer(doc, **params))
 
