@@ -197,3 +197,83 @@ class XSLTTransformUnitTest(TestCase):
         yield pipe(item, send)
         self.assertEquals(send.call_count, 1)
         self.assertThat(send.call_args, matches)
+
+    @run_test_with(AsynchronousDeferredRunTest)
+    @defer.inlineCallbacks
+    def test_dynamic_strparam(self):
+        """
+        Operates on fixtures/05-dynamic-strparam.*
+        see: https://www.w3.org/TR/xslt#section-Examples
+        """
+        xsl_path = os.path.join(FIXTURE_DIRECTORY, '05-dynamic-strparam.xsl')
+        pipe = XSLT(xsl_path, params={'extract_id': {'from': 'extract_id'}})
+
+        input_data = b''
+        input_path = os.path.join(FIXTURE_DIRECTORY, '05-dynamic-strparam-data.xml')
+        with open(input_path, 'rb') as input_file:
+            input_data = input_file.read()
+
+        expected_data = b''
+        expected_path = os.path.join(FIXTURE_DIRECTORY, '05-dynamic-strparam-expected.xml')
+        with open(expected_path, 'rb') as expected_file:
+            expected_data = expected_file.read()
+
+        item = {
+            'inserts': ['b'],
+            'deletes': [],
+            'data': {
+                'b': {
+                    'extract_id': 'West',
+                    'content': input_data
+                }
+            }
+        }
+
+        expected = copy.deepcopy(item)
+        expected['data']['b']['content'] = expected_data
+
+        matches = MatchesSendDeltaItemInvocation(expected, pipe)
+        send = Mock(spec=Scheduler.send)
+        yield pipe(item, send)
+        self.assertEquals(send.call_count, 1)
+        self.assertThat(send.call_args, matches)
+
+    @run_test_with(AsynchronousDeferredRunTest)
+    @defer.inlineCallbacks
+    def test_dynamic_rawparam(self):
+        """
+        Operates on fixtures/06-dynamic-param.*
+        see: https://www.w3.org/TR/xslt#section-Examples
+        """
+        xsl_path = os.path.join(FIXTURE_DIRECTORY, '06-dynamic-param.xsl')
+        pipe = XSLT(xsl_path, params={'extract_pos': {'from': 'extracted_pos', 'raw': True}})
+
+        input_data = b''
+        input_path = os.path.join(FIXTURE_DIRECTORY, '06-dynamic-param-data.xml')
+        with open(input_path, 'rb') as input_file:
+            input_data = input_file.read()
+
+        expected_data = b''
+        expected_path = os.path.join(FIXTURE_DIRECTORY, '06-dynamic-param-expected.xml')
+        with open(expected_path, 'rb') as expected_file:
+            expected_data = expected_file.read()
+
+        item = {
+            'inserts': ['b'],
+            'deletes': [],
+            'data': {
+                'b': {
+                    'extracted_pos': '1',
+                    'content': input_data
+                }
+            }
+        }
+
+        expected = copy.deepcopy(item)
+        expected['data']['b']['content'] = expected_data
+
+        matches = MatchesSendDeltaItemInvocation(expected, pipe)
+        send = Mock(spec=Scheduler.send)
+        yield pipe(item, send)
+        self.assertEquals(send.call_count, 1)
+        self.assertThat(send.call_args, matches)

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<division id="North">
+  <revenue>10</revenue>
+  <growth>9</growth>
+  <bonus>7</bonus>
+</division>
