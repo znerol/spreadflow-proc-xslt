@@ -6,4 +6,6 @@ install:
   - python bootstrap.py
   - bin/buildout
 script:
-  - bin/trial spreadflow_xslt
+  - bin/coverage run bin/trial spreadflow_xslt
+after_success:
+  - bin/coveralls
