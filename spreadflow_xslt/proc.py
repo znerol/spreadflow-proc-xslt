@@ -35,11 +35,6 @@ class XSLT(object):
         self._strparams = ()
         self._rawparams = ()
 
-        try:
-            strtype = basestring
-        except NameError:
-            strtype = str
-
         def _add_literal_param(param, value, raw=False):
             self._literal_params += ((param, value),) if raw else ((param, etree.XSLT.strparam(value)),)
 
@@ -58,11 +53,7 @@ class XSLT(object):
                             self._strparams += ((param, value['from']),)
                         continue
 
-                if isinstance(value, strtype):
-                    _add_literal_param(param, value, False)
-                    continue
-
-                _add_literal_param(param, value, True)
+                _add_literal_param(param, value, False)
 
     @defer.inlineCallbacks
     def __call__(self, item, send):
