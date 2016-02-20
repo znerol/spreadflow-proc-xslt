@@ -15,7 +15,7 @@ from lxml import etree
 
 class XSLT(object):
 
-    def __init__(self, path, key='content', destkey=None, encoding=None, params=None, coiterate=True):
+    def __init__(self, path, key='content', destkey=None, encoding=None, params=None, strparams=None, paramskey=None, strparamskey=None, coiterate=True):
         self.path = path
         self.key = key
         self.destkey = destkey if destkey else key
@@ -23,37 +23,24 @@ class XSLT(object):
         self.transformer = None
         self.encoding = encoding
 
-        if coiterate == True:
+        self._literal_params = {}
+        if params:
+            self._literal_params.update(params)
+
+        if strparams:
+            for param, value in strparams.items():
+                self._literal_params[param] = etree.XSLT.strparam(value)
+
+        self.paramskey = paramskey
+        self.strparamskey = strparamskey
+
+        if coiterate is True:
             from twisted.internet.task import coiterate
 
         if coiterate:
             self.coiterate = coiterate
         else:
             self.coiterate = self._dummy_coiterate
-
-        self._literal_params = ()
-        self._strparams = ()
-        self._rawparams = ()
-
-        def _add_literal_param(param, value, raw=False):
-            self._literal_params += ((param, value),) if raw else ((param, etree.XSLT.strparam(value)),)
-
-        if params:
-            for param, value in params.items():
-                if isinstance(value, collections.Mapping):
-                    raw = value.get('raw', False)
-                    if 'value' in value:
-                        _add_literal_param(param, value['value'], raw)
-                        continue
-
-                    if 'from' in value:
-                        if raw:
-                            self._rawparams += ((param, value['from']),)
-                        else:
-                            self._strparams += ((param, value['from']),)
-                        continue
-
-                _add_literal_param(param, value, False)
 
     @defer.inlineCallbacks
     def __call__(self, item, send):
@@ -92,8 +79,13 @@ class XSLT(object):
         return defer.succeed(iterator)
 
     def _extract_params(self, doc):
-        return dict(
-            self._literal_params +
-            tuple([(param, doc[value]) for param, value in self._rawparams]) +
-            tuple([(param, etree.XSLT.strparam(doc[value])) for param, value in self._strparams])
-        )
+        result = self._literal_params.copy()
+
+        if self.paramskey:
+            result.update(doc[self.paramskey])
+
+        if self.strparamskey:
+            for param, value in doc[self.strparamskey].items():
+                result[param] = etree.XSLT.strparam(value)
+
+        return result

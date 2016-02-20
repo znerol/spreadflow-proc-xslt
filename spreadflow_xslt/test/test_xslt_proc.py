@@ -108,7 +108,7 @@ class XSLTTransformUnitTest(TestCase):
         see: https://www.w3.org/TR/xslt#section-Examples
         """
         xsl_path = os.path.join(FIXTURE_DIRECTORY, '03-literal-strparam.xsl')
-        pipe = XSLT(xsl_path, params={'extract_id': 'South'})
+        pipe = XSLT(xsl_path, strparams={'extract_id': 'South'})
 
         input_data = b''
         input_path = os.path.join(FIXTURE_DIRECTORY, '03-literal-strparam-data.xml')
@@ -139,28 +139,6 @@ class XSLTTransformUnitTest(TestCase):
         self.assertEquals(send.call_count, 1)
         self.assertThat(send.call_args, matches)
 
-        # Test dictionary form.
-        pipe = XSLT(xsl_path, params={'extract_id': {'value': 'South'}})
-
-        item = {
-            'inserts': ['b'],
-            'deletes': [],
-            'data': {
-                'b': {
-                    'content': input_data
-                }
-            }
-        }
-
-        expected = copy.deepcopy(item)
-        expected['data']['b']['content'] = expected_data
-
-        matches = MatchesSendDeltaItemInvocation(expected, pipe)
-        send = Mock(spec=Scheduler.send)
-        yield pipe(item, send)
-        self.assertEquals(send.call_count, 1)
-        self.assertThat(send.call_args, matches)
-
     @run_test_with(AsynchronousDeferredRunTest)
     @defer.inlineCallbacks
     def test_literal_rawparam(self):
@@ -169,7 +147,7 @@ class XSLTTransformUnitTest(TestCase):
         see: https://www.w3.org/TR/xslt#section-Examples
         """
         xsl_path = os.path.join(FIXTURE_DIRECTORY, '04-literal-param.xsl')
-        pipe = XSLT(xsl_path, params={'extract_pos': {'value': '2', 'raw': True}})
+        pipe = XSLT(xsl_path, params={'extract_pos': '2'})
 
         input_data = b''
         input_path = os.path.join(FIXTURE_DIRECTORY, '04-literal-param-data.xml')
@@ -208,7 +186,7 @@ class XSLTTransformUnitTest(TestCase):
         see: https://www.w3.org/TR/xslt#section-Examples
         """
         xsl_path = os.path.join(FIXTURE_DIRECTORY, '05-dynamic-strparam.xsl')
-        pipe = XSLT(xsl_path, params={'extract_id': {'from': 'extract_id'}})
+        pipe = XSLT(xsl_path, strparamskey='params')
 
         input_data = b''
         input_path = os.path.join(FIXTURE_DIRECTORY, '05-dynamic-strparam-data.xml')
@@ -225,7 +203,9 @@ class XSLTTransformUnitTest(TestCase):
             'deletes': [],
             'data': {
                 'b': {
-                    'extract_id': 'West',
+                    'params': {
+                        'extract_id': 'West',
+                    },
                     'content': input_data
                 }
             }
@@ -248,7 +228,7 @@ class XSLTTransformUnitTest(TestCase):
         see: https://www.w3.org/TR/xslt#section-Examples
         """
         xsl_path = os.path.join(FIXTURE_DIRECTORY, '06-dynamic-param.xsl')
-        pipe = XSLT(xsl_path, params={'extract_pos': {'from': 'extracted_pos', 'raw': True}})
+        pipe = XSLT(xsl_path, paramskey='params')
 
         input_data = b''
         input_path = os.path.join(FIXTURE_DIRECTORY, '06-dynamic-param-data.xml')
@@ -265,7 +245,9 @@ class XSLTTransformUnitTest(TestCase):
             'deletes': [],
             'data': {
                 'b': {
-                    'extracted_pos': '1',
+                    'params': {
+                        'extract_pos': '1',
+                    },
                     'content': input_data
                 }
             }
@@ -287,7 +269,7 @@ class XSLTTransformUnitTest(TestCase):
         Operates on fixtures/07-no-input-doc.*
         """
         xsl_path = os.path.join(FIXTURE_DIRECTORY, '07-no-input-doc.xsl')
-        pipe = XSLT(xsl_path, params={'who': 'slartibartfast'}, key=None, destkey='content')
+        pipe = XSLT(xsl_path, strparams={'who': 'slartibartfast'}, key=None, destkey='content')
 
         expected_data = b''
         expected_path = os.path.join(FIXTURE_DIRECTORY, '07-no-input-doc-expected.xml')
@@ -319,7 +301,7 @@ class XSLTTransformUnitTest(TestCase):
         Operates on fixtures/08-encoded-output.*
         """
         xsl_path = os.path.join(FIXTURE_DIRECTORY, '08-encoded-output.xsl')
-        pipe = XSLT(xsl_path, params={'who': 'Birgitta Jónsdóttir'}, key=None, destkey='content', encoding='utf-8')
+        pipe = XSLT(xsl_path, strparams={'who': 'Birgitta Jónsdóttir'}, key=None, destkey='content', encoding='utf-8')
 
         expected_data = ''
         expected_path = os.path.join(FIXTURE_DIRECTORY, '08-encoded-output-expected.xml')
