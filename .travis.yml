@@ -8,6 +8,6 @@ install:
   - pip install -r test-requirements.txt
   - pip install -e .[tests]
 script:
-  - coverage run trial spreadflow_xslt
+  - coverage run `which trial` spreadflow_xslt
 after_success:
   - coveralls
