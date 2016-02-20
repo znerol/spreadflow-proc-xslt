@@ -3,7 +3,6 @@ from __future__ import division
 from __future__ import unicode_literals
 
 import collections
-import functools
 
 from twisted.internet import defer
 
