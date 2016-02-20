@@ -2,10 +2,12 @@ language: python
 python:
   - 2.7
   - 3.4
+cache:
+  - pip
 install:
-  - python bootstrap.py
-  - bin/buildout
+  - pip install -r test-requirements.txt
+  - pip install -e .[tests]
 script:
-  - bin/coverage run bin/trial spreadflow_xslt
+  - coverage run trial spreadflow_xslt
 after_success:
-  - bin/coveralls
+  - coveralls
