@@ -10,13 +10,4 @@
 /twisted/plugins/dropin.cache
 
 # Buildout paths
-/*.egg-info
-/.installed.cfg
-/.mr.developer.cfg
-/bin
-/develop-eggs
-/dist
-/downloads
-/eggs
-/parts
 /src
