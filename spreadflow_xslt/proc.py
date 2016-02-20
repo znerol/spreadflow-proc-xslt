@@ -64,7 +64,7 @@ class XSLT(object):
             params = self._extract_params(item['data'][oid])
             markup = bytes(self.transformer(doc, **params))
 
-            if self.encoding != None:
+            if self.encoding is not None:
                 markup = markup.decode(self.encoding)
 
             item['data'][oid][self.destkey] = markup
