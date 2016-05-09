@@ -1,10 +1,10 @@
 SpreadFlow XSLT Processor
 =========================
 
-.. image:: https://travis-ci.org/znerol/spreadflow-xslt.svg?branch=master
-    :target: https://travis-ci.org/znerol/spreadflow-xslt
-.. image:: https://coveralls.io/repos/github/znerol/spreadflow-xslt/badge.svg?branch=master
-    :target: https://coveralls.io/github/znerol/spreadflow-xslt?branch=master
+.. image:: https://travis-ci.org/spreadflow/spreadflow-xslt.svg?branch=master
+    :target: https://travis-ci.org/spreadflow/spreadflow-xslt
+.. image:: https://coveralls.io/repos/github/spreadflow/spreadflow-xslt/badge.svg?branch=master
+    :target: https://coveralls.io/github/spreadflow/spreadflow-xslt?branch=master
 
 
 XSLT processor for SpreadFlow metadata extraction and processing engine.
