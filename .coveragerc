@@ -3,6 +3,13 @@
 
 [run]
 branch = True
-source = spreadflow_xslt
+source_pkgs =
+    spreadflow_xslt
 omit =
-    spreadflow_xslt/test/*
+    /tmp/**
+    spreadflow_xslt/test/**
+
+[report]
+omit =
+    /tmp/**
+    spreadflow_xslt/test/**
